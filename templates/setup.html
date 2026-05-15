@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div data-screen="setup" class="game-container max-w-4xl mx-auto rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8">
+    <h2 class="text-2xl sm:text-3xl font-bold text-purple-800 mb-4 sm:mb-6 text-center">
+        <i class="fas fa-user-plus"></i> Add Players
+    </h2>
+    
+    <div id="playerInputs" class="space-y-3 mb-6">
+    </div>
+    
+    <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+        <button onclick="window.location.href='/'" class="btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
+            <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <button onclick="clearNames()" class="btn bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
+            <i class="fas fa-eraser"></i> Clear Names
+        </button>
+        <button onclick="assignRolesAndRedirect()" class="btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
+            <i class="fas fa-play"></i> Start Game
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function init() {
+    const container = document.getElementById('playerInputs');
+    generatePlayerInputs(container, gameState.playerCount);
+    
+    // Restore saved player names and colors
+    if (gameState.players && gameState.players.length > 0) {
+        gameState.players.forEach((player, index) => {
+            const nameInput = document.getElementById(`player${index + 1}`);
+            const colorInput = document.getElementById(`color${index + 1}`);
+            
+            if (nameInput && player.name && !player.name.startsWith('Player ')) {
+                nameInput.value = player.name;
+            }
+            if (colorInput && player.color) {
+                colorInput.value = player.color;
+            }
+        });
+    }
+}
+
+function clearNames() {
+    if (confirm('Clear all player names and colors?')) {
+        for (let i = 1; i <= gameState.playerCount; i++) {
+            const nameInput = document.getElementById(`player${i}`);
+            const colorInput = document.getElementById(`color${i}`);
+            
+            if (nameInput) nameInput.value = '';
+            if (colorInput) colorInput.value = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+        }
+    }
+}
+
+function assignRolesAndRedirect() {
+    const players = [];
+    
+    for (let i = 1; i <= gameState.playerCount; i++) {
+        const name = document.getElementById(`player${i}`).value || `Player ${i}`;
+        const color = document.getElementById(`color${i}`).value;
+        
+        players.push({
+            id: i,
+            name: name,
+            color: color,
+            role: 'crewmate'
+        });
+    }
+    
+    const assignedPlayers = assignRoles(players, gameState.imposterCount, gameState.jesterCount);
+    gameState.setPlayers(assignedPlayers);
+    
+    window.location.href = '/reveal';
+}
+
+init();
+</script>
+{% endblock %}

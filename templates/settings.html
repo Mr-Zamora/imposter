@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div data-screen="settings" class="game-container max-w-4xl mx-auto rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8">
+    <h2 class="text-2xl sm:text-3xl font-bold text-purple-800 mb-4 sm:mb-6 text-center">
+        <i class="fas fa-cog"></i> Game Settings
+    </h2>
+    
+    <div class="space-y-4 sm:space-y-6">
+        <div class="bg-white rounded-lg p-4 sm:p-6">
+            <h3 class="text-lg sm:text-xl font-semibold text-purple-800 mb-3 sm:mb-4">Player Configuration</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                    <label class="text-base sm:text-lg font-semibold block mb-1">Players:</label>
+                    <select id="playerCount" class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none text-base">
+                        {% for i in range(4, 14) %}
+                        <option value="{{ i }}" {% if i == 6 %}selected{% endif %}>{{ i }} Players</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="text-base sm:text-lg font-semibold block mb-1">Imposters:</label>
+                    <select id="imposterCount" class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none text-base">
+                        {% for i in range(1, 5) %}
+                        <option value="{{ i }}">{{ i }} Imposter{{ 's' if i > 1 else '' }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="text-base sm:text-lg font-semibold block mb-1">Jester:</label>
+                    <select id="jesterCount" class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none text-base">
+                        <option value="0">No Jester</option>
+                        <option value="1">1 Jester</option>
+                        <option value="2">2 Jesters</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg p-4 sm:p-6">
+            <h3 class="text-lg sm:text-xl font-semibold text-purple-800 mb-3 sm:mb-4">Secret Word Settings</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-base sm:text-lg font-semibold block mb-1">Secret Word:</label>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="password" id="secretWord" placeholder="Enter secret word" class="flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none text-base">
+                        <div class="flex gap-2">
+                            <button onclick="toggleWordVisibility()" class="btn bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg flex-1 sm:flex-none" title="Show/Hide word">
+                                <i class="fas fa-eye" id="wordToggleIcon"></i>
+                            </button>
+                            <button onclick="generateRandomWord()" class="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg flex-1 sm:flex-none" title="Generate random word">
+                            <i class="fas fa-dice"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-base sm:text-lg font-semibold block mb-1">Jester Info:</label>
+                    <select id="jesterInfo" class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none text-base">
+                        <option value="nothing">Nothing</option>
+                        <option value="category">Category Only</option>
+                        <option value="partial">Partial Word</option>
+                        <option value="full">Full Word</option>
+                    </select>
+                </div>
+                <div>
+                    <button onclick="toggleWordOptions()" class="btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+                        <i class="fas fa-eye" id="toggleIcon"></i> <span id="toggleText">Show Word Options</span>
+                    </button>
+                </div>
+                <div id="wordOptions" class="hidden space-y-4">
+                    <div>
+                        <label class="text-base sm:text-lg font-semibold block mb-1">Word Category:</label>
+                        <select id="wordCategory" class="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border-2 border-purple-300 focus:border-purple-500 focus:outline-none text-base" onchange="updateWordSuggestions()">
+                            {% for category in categories %}
+                            <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                            <option value="custom">Custom Word</option>
+                        </select>
+                    </div>
+                    <div id="wordSuggestion">
+                        <label class="text-base sm:text-lg font-semibold block mb-2">Suggested Words:</label>
+                        <div id="suggestedWords" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600">
+                    <p><strong>Nothing:</strong> Jester gets no word info</p>
+                    <p><strong>Category:</strong> Jester sees word category (e.g., "Animal", "Food")</p>
+                    <p><strong>Partial:</strong> Jester sees part of word (e.g., first 3 letters)</p>
+                    <p><strong>Full:</strong> Jester sees complete word</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+            <button onclick="window.location.href='/'" class="btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button onclick="saveSettings()" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
+                <i class="fas fa-save"></i> Save Settings
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let wordsData = {};
+
+async function init() {
+    wordsData = await wordManager.loadWords();
+    
+    document.getElementById('playerCount').value = gameState.playerCount;
+    document.getElementById('imposterCount').value = gameState.imposterCount;
+    document.getElementById('jesterCount').value = gameState.jesterCount;
+    document.getElementById('jesterInfo').value = gameState.jesterInfo;
+    document.getElementById('wordCategory').value = gameState.wordCategory;
+    if (gameState.secretWord) {
+        document.getElementById('secretWord').value = gameState.secretWord;
+    }
+}
+
+function toggleWordVisibility() {
+    const input = document.getElementById('secretWord');
+    const icon = document.getElementById('wordToggleIcon');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+async function generateRandomWord() {
+    const category = document.getElementById('wordCategory').value;
+    const word = await wordManager.getRandomWord(category !== 'custom' ? category : null);
+    document.getElementById('secretWord').value = word;
+}
+
+function toggleWordOptions() {
+    const options = document.getElementById('wordOptions');
+    const icon = document.getElementById('toggleIcon');
+    const text = document.getElementById('toggleText');
+    
+    if (options.classList.contains('hidden')) {
+        options.classList.remove('hidden');
+        icon.className = 'fas fa-eye-slash';
+        text.textContent = 'Hide Word Options';
+        updateWordSuggestions();
+    } else {
+        options.classList.add('hidden');
+        icon.className = 'fas fa-eye';
+        text.textContent = 'Show Word Options';
+    }
+}
+
+function updateWordSuggestions() {
+    const category = document.getElementById('wordCategory').value;
+    const container = document.getElementById('suggestedWords');
+    const suggestionDiv = document.getElementById('wordSuggestion');
+    
+    if (category === 'custom') {
+        suggestionDiv.classList.add('hidden');
+    } else {
+        suggestionDiv.classList.remove('hidden');
+        const words = wordsData[category] || [];
+        container.innerHTML = words.map(word => 
+            `<button onclick="selectWord('${word}')" class="btn bg-purple-100 hover:bg-purple-200 px-2 py-1 rounded text-sm">${word}</button>`
+        ).join('');
+    }
+}
+
+function selectWord(word) {
+    document.getElementById('secretWord').value = word;
+}
+
+function saveSettings() {
+    gameState.setPlayerCount(document.getElementById('playerCount').value);
+    gameState.setImposterCount(document.getElementById('imposterCount').value);
+    gameState.setJesterCount(document.getElementById('jesterCount').value);
+    gameState.setJesterInfo(document.getElementById('jesterInfo').value);
+    gameState.setWordCategory(document.getElementById('wordCategory').value);
+    
+    const secretWord = document.getElementById('secretWord').value;
+    if (secretWord) {
+        gameState.setSecretWord(secretWord);
+    }
+    
+    showNotification('Settings saved!', 'success');
+    setTimeout(() => window.location.href = '/', 1000);
+}
+
+init();
+</script>
+{% endblock %}

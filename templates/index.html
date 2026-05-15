@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div data-screen="welcome" class="game-container max-w-4xl mx-auto rounded-2xl shadow-2xl overflow-hidden">
+    <div class="text-center">
+        <img src="{{ url_for('static', filename='images/header.png') }}" alt="Imposter Game" class="w-full h-auto">
+        
+        <div class="bg-purple-100 p-4 sm:p-6 mb-6 sm:mb-8">
+            <!--<h2 class="text-xl sm:text-2xl font-semibold text-purple-800 mb-3 sm:mb-4">Setup</h2>-->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-left">
+                <div class="bg-white rounded-lg p-3 sm:p-4">
+                    <h3 class="font-bold text-purple-700 mb-2 text-base sm:text-lg">
+                        <i class="fas fa-users"></i> Crewmates
+                    </h3>
+                    <ul class="text-xs sm:text-sm text-gray-700 space-y-1">
+                        <li>• Find the imposter</li>
+                        <li>• Work together as a team</li>
+                        <li>• Use secret word to identify friends</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg p-3 sm:p-4">
+                    <h3 class="font-bold text-red-700 mb-2 text-base sm:text-lg">
+                        <i class="fas fa-skull"></i> Imposter
+                    </h3>
+                    <ul class="text-xs sm:text-sm text-gray-700 space-y-1">
+                        <li>• Avoid getting voted out to win</li>
+                        <li>• Blend in and deceive</li>
+                        <li>• Don't know the secret word</li>
+                    </ul>
+                </div>
+                <div class="bg-white rounded-lg p-3 sm:p-4">
+                    <h3 class="font-bold text-green-700 mb-2 text-base sm:text-lg">
+                        <i class="fas fa-masks-theater"></i> Jester
+                    </h3>
+                    <ul class="text-xs sm:text-sm text-gray-700 space-y-1">
+                        <li>• Get voted out to win</li>
+                        <li>• See partial word info</li>
+                        <li>• Act suspicious to get eliminated</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4 mt-6 sm:mt-8 mb-4 sm:mb-6 px-4 sm:px-6">
+            <button onclick="window.location.href='/settings'" class="btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg text-lg sm:text-xl w-full sm:w-auto">
+                <i class="fas fa-cog"></i> Game Settings
+            </button>
+            
+            <button onclick="startGame()" class="btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 sm:px-8 rounded-xl text-lg sm:text-xl w-full sm:w-auto">
+                <i class="fas fa-random"></i> Assign Roles
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function startGame() {
+    if (!gameState.secretWord) {
+        gameState.secretWord = await wordManager.getRandomWord();
+    }
+    window.location.href = '/setup';
+}
+</script>
+{% endblock %}

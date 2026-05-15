@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Randomness Test</title>
+</head>
+<body>
+    <h1>Role Assignment Randomness Test</h1>
+    <p>Testing 1000 games with 4 players, 1 imposter, 1 jester</p>
+    <div id="results"></div>
+
+    <script>
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function assignRoles(players, imposterCount, jesterCount) {
+            const playersCopy = players.map(p => ({...p, role: 'crewmate'}));
+            
+            const indices = shuffleArray([...Array(players.length).keys()]);
+            let roleIndex = 0;
+            
+            for (let i = 0; i < imposterCount; i++) {
+                playersCopy[indices[roleIndex++]].role = 'imposter';
+            }
+            
+            for (let i = 0; i < jesterCount; i++) {
+                playersCopy[indices[roleIndex++]].role = 'jester';
+            }
+            
+            return playersCopy;
+        }
+
+        // Test 1000 games
+        const numTests = 1000;
+        const playerCount = 4;
+        const imposterPositions = [0, 0, 0, 0];
+        const jesterPositions = [0, 0, 0, 0];
+
+        for (let test = 0; test < numTests; test++) {
+            const players = [];
+            for (let i = 0; i < playerCount; i++) {
+                players.push({
+                    id: i + 1,
+                    name: `Player ${i + 1}`,
+                    role: 'crewmate'
+                });
+            }
+
+            const assigned = assignRoles(players, 1, 1);
+
+            // Track positions
+            assigned.forEach((player, index) => {
+                if (player.role === 'imposter') {
+                    imposterPositions[index]++;
+                }
+                if (player.role === 'jester') {
+                    jesterPositions[index]++;
+                }
+            });
+        }
+
+        // Display results
+        let html = '<h2>Results after ' + numTests + ' games:</h2>';
+        
+        html += '<h3>Imposter Position Distribution:</h3><ul>';
+        imposterPositions.forEach((count, index) => {
+            const percentage = (count / numTests * 100).toFixed(1);
+            html += `<li>Position ${index + 1}: ${count} times (${percentage}%) - Expected: ~25%</li>`;
+        });
+        html += '</ul>';
+
+        html += '<h3>Jester Position Distribution:</h3><ul>';
+        jesterPositions.forEach((count, index) => {
+            const percentage = (count / numTests * 100).toFixed(1);
+            html += `<li>Position ${index + 1}: ${count} times (${percentage}%) - Expected: ~25%</li>`;
+        });
+        html += '</ul>';
+
+        html += '<h3>Analysis:</h3>';
+        const imposterMax = Math.max(...imposterPositions);
+        const imposterMin = Math.min(...imposterPositions);
+        const jesterMax = Math.max(...jesterPositions);
+        const jesterMin = Math.min(...jesterPositions);
+        
+        html += `<p>Imposter variance: ${imposterMax - imposterMin} (lower is better, should be < 100)</p>`;
+        html += `<p>Jester variance: ${jesterMax - jesterMin} (lower is better, should be < 100)</p>`;
+        
+        if (imposterMax - imposterMin < 100 && jesterMax - jesterMin < 100) {
+            html += '<p style="color: green; font-weight: bold;">✅ Randomness is GOOD - distribution is even!</p>';
+        } else {
+            html += '<p style="color: red; font-weight: bold;">❌ Randomness may be BIASED - check the code!</p>';
+        }
+
+        document.getElementById('results').innerHTML = html;
+    </script>
+</body>
+</html>
