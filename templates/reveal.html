@@ -25,7 +25,11 @@
 let currentIndex = 0;
 
 async function playAgain() {
-    gameState.secretWord = await wordManager.getRandomWord();
+    // Use the saved category from settings
+    const category = gameState.wordCategory !== 'custom' ? gameState.wordCategory : null;
+    gameState.secretWord = await wordManager.getRandomWord(category);
+    gameState.setSecretWord(gameState.secretWord);
+    
     const assignedPlayers = assignRoles(gameState.players, gameState.imposterCount, gameState.jesterCount);
     gameState.setPlayers(assignedPlayers);
     currentIndex = 0;
@@ -38,9 +42,10 @@ function showCurrentPlayer() {
     if (currentIndex >= gameState.players.length) {
         container.innerHTML = `
             <div class="text-center">
-                <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">All Roles Assigned!</h3>
-                <p class="text-base sm:text-lg mb-4 sm:mb-6">The game can now begin!</p>
-                <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Remember your role and don't reveal it to others!</p>
+                <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">All roles are assigned!</h3>
+                <p class="text-base sm:text-lg text-gray-600">
+                    The game can now begin, remember your role and don't reveal it to others.
+                </p>
             </div>
         `;
         return;

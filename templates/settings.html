@@ -62,11 +62,6 @@
                         <option value="full">Full Word</option>
                     </select>
                 </div>
-                <div>
-                    <button onclick="toggleWordOptions()" class="btn bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
-                        <i class="fas fa-eye" id="toggleIcon"></i> <span id="toggleText">Show Word Options</span>
-                    </button>
-                </div>
                 <div id="wordOptions" class="hidden space-y-4">
                     <div>
                         <label class="text-base sm:text-lg font-semibold block mb-1">Word Category:</label>
@@ -92,9 +87,12 @@
             </div>
         </div>
         
-        <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+        <div class="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-6 sm:mt-8">
             <button onclick="window.location.href='/'" class="btn bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
                 <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button onclick="showWordOptions()" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
+                <i class="fas fa-list"></i> Show Word Options
             </button>
             <button onclick="saveSettings()" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
                 <i class="fas fa-save"></i> Save Settings
@@ -140,24 +138,27 @@ async function generateRandomWord() {
     document.getElementById('secretWord').value = word;
 }
 
-function toggleWordOptions() {
+function showWordOptions() {
     const options = document.getElementById('wordOptions');
-    const icon = document.getElementById('toggleIcon');
-    const text = document.getElementById('toggleText');
+    const button = event.target.closest('button');
+    const icon = button.querySelector('i');
+    const textSpan = button.childNodes[1]; // Text node after icon
     
     if (options.classList.contains('hidden')) {
         options.classList.remove('hidden');
         icon.className = 'fas fa-eye-slash';
-        text.textContent = 'Hide Word Options';
+        button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Word Options';
         updateWordSuggestions();
+        // Scroll to word options
+        setTimeout(() => options.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
     } else {
         options.classList.add('hidden');
-        icon.className = 'fas fa-eye';
-        text.textContent = 'Show Word Options';
+        icon.className = 'fas fa-list';
+        button.innerHTML = '<i class="fas fa-list"></i> Show Word Options';
     }
 }
 
-function updateWordSuggestions() {
+async function updateWordSuggestions() {
     const category = document.getElementById('wordCategory').value;
     const container = document.getElementById('suggestedWords');
     const suggestionDiv = document.getElementById('wordSuggestion');
@@ -170,6 +171,10 @@ function updateWordSuggestions() {
         container.innerHTML = words.map(word => 
             `<button onclick="selectWord('${word}')" class="btn bg-purple-100 hover:bg-purple-200 px-2 py-1 rounded text-sm">${word}</button>`
         ).join('');
+        
+        // Auto-generate random word from selected category
+        const randomWord = await wordManager.getRandomWord(category);
+        document.getElementById('secretWord').value = randomWord;
     }
 }
 
@@ -177,14 +182,22 @@ function selectWord(word) {
     document.getElementById('secretWord').value = word;
 }
 
-function saveSettings() {
+async function saveSettings() {
     gameState.setPlayerCount(document.getElementById('playerCount').value);
     gameState.setImposterCount(document.getElementById('imposterCount').value);
     gameState.setJesterCount(document.getElementById('jesterCount').value);
     gameState.setJesterInfo(document.getElementById('jesterInfo').value);
-    gameState.setWordCategory(document.getElementById('wordCategory').value);
     
-    const secretWord = document.getElementById('secretWord').value;
+    const category = document.getElementById('wordCategory').value;
+    gameState.setWordCategory(category);
+    
+    let secretWord = document.getElementById('secretWord').value;
+    
+    // If no word is set, generate one from the selected category
+    if (!secretWord && category !== 'custom') {
+        secretWord = await wordManager.getRandomWord(category);
+    }
+    
     if (secretWord) {
         gameState.setSecretWord(secretWord);
     }
