@@ -2,7 +2,13 @@
 
 A social deduction game for 4-13 players built with Flask, Jinja templates, and vanilla JavaScript.
 
-## 🚀 Quick Start
+## 🎮 Play Online
+
+**Live Demo**: [https://imposter2026.pythonanywhere.com/](https://imposter2026.pythonanywhere.com/)
+
+No installation required - just visit the link and start playing!
+
+## 🚀 Quick Start (Local Development)
 
 ```bash
 # Install dependencies
