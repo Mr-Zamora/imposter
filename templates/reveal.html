@@ -10,7 +10,7 @@
     </div>
     
     <div class="flex flex-col sm:flex-row justify-center mt-6 gap-3 sm:gap-4">
-        <button onclick="playAgain()" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
+        <button onclick="playAgain()" class="btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
             <i class="fas fa-redo"></i> Play Again
         </button>
         <button onclick="window.location.href='/'" class="btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg w-full sm:w-auto">
@@ -82,13 +82,13 @@ function showCurrentPlayer() {
             <div class="text-5xl sm:text-6xl mb-3 sm:mb-4">
                 <i class="fas fa-user-astronaut text-blue-600"></i>
             </div>
-            <div class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-blue-600">
+            <div class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-blue-600">
                 CREWMATE
             </div>
-            <p class="text-base sm:text-lg text-blue-600">Find the imposter!</p>
-            <div class="bg-blue-100 rounded-lg p-3 sm:p-4 mt-3 sm:mt-4">
-                <p class="text-base sm:text-lg text-blue-800 font-semibold">Secret Word: ${gameState.secretWord}</p>
-                <p class="text-xs sm:text-sm text-blue-600 mt-2">Use this to identify other crewmates</p>
+            <div class="bg-blue-100 rounded-lg p-4 sm:p-6 mt-4 sm:mt-6">
+                <p class="text-lg sm:text-xl text-blue-600 mb-3">Secret Word:</p>
+                <div class="text-2xl sm:text-3xl font-bold text-blue-600 pulse-word mb-3">${gameState.secretWord}</div>
+                <p class="text-sm sm:text-base text-blue-600">Use this to identify other crewmates</p>
             </div>
         `;
     }
@@ -98,7 +98,7 @@ function showCurrentPlayer() {
             <div id="playerHeader">
                 <h3 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">${player.name}</h3>
                 <p class="text-base sm:text-lg mb-4 sm:mb-6 text-gray-600 px-2">Pass device to ${player.name} and click below to reveal their role:</p>
-                <button onclick="revealRole()" class="btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg mb-4 sm:mb-6 w-full sm:w-auto">
+                <button onclick="revealRole()" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg mb-4 sm:mb-6 w-full sm:w-auto">
                     <i class="fas fa-eye"></i> Reveal Role
                 </button>
             </div>

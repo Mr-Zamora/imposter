@@ -9,8 +9,23 @@
     }
 }
 
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+}
+
 .slide-in {
     animation: slideIn 0.3s ease-out;
+}
+
+.pulse-word {
+    animation: pulse 2s ease-in-out infinite;
 }
 
 body {
